@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register App</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body style="background-color: darkkhaki">
+<h1>Motorvognregister</h1>
+<table class="table table-striped">
+    <tr>
+        <td><label>Eiers personnr</label><br/><input type="text" id="prsnrInput"> </td>
+        <td><label>Eiers navn</label> <br/><input type="text" id="navnInput"></td>
+        <td><label>Eiers adresse</label> <br/><input type="text" id="adresseInput"></td>
+    </tr>
+    <tr>
+        <td><label>Kjennetegn</label> <br/><input type="text" id="kjennetegnInput"></td>
+        <td><label>Bilmerke</label> <br/><input type="text" id="bilmerkeInput"></td>
+        <td><label>Biltype</label> <br/><input type="text" id="biltypeInput"></td>
+    </tr>
+</table>
+<div class="text-right" style="margin-right: 20%">
+<button type="button" class="btn btn-primary" onclick="register()">Register</button>
+</div>
+<h2>Alle Bilene</h2>
+<div id="register"></div>
+<div class="text-right" style="margin-right: 20%">
+<button type="button" class="btn btn-danger" onclick="slettKundene()">Slett Alle</button>
+</div>
+<script type="application/javascript">
+    function register() {
+
+        const registerApp = {
+            personnr: $("#prsnrInput").val(),
+            navn: $("#navnInput").val(),
+            adresse: $("#adresseInput").val(),
+            kjennetegn: $("#kjennetegnInput").val(),
+            bilmerke: $("#bilmerkeInput").val(),
+            biltype: $("#biltypeInput").val()
+        };
+
+        $.post("/lagre", registerApp, function () {
+            hentAlle();
+
+        });
+
+        $("#prsnrInput").val("");
+        $("#navnInput").val("");
+        $("#adresseInput").val("");
+        $("#kjennetegnInput").val("");
+        $("#bilmerkeInput").val("");
+        $("#biltypeInput").val("");
+
+    }
+        function hentAlle() {
+            $.get("/hentAlle", function (data) {
+                formaterData(data);
+            });
+        }
+
+        function formaterData(registerKunde) {
+            let ut = "<table class=\"table table-bordered\">" +
+                "<th>Personnr</th>" +
+                "<th>Navn</th>" +
+                "<th>Adresse</th>" +
+                "<th>Kjennetegn</th>" +
+                "<th>Bilmerke</th>" +
+                "<th>Biltype</th>" +
+                "</tr>";
+
+
+            for (const registerInfo of registerKunde) {
+                ut += "<tr><td>" + registerInfo.personnr + "</td>" +
+                    "<td>" + registerInfo.navn + "</td><td>" + registerInfo.adresse + "</td>" +
+                    "<td>" + registerInfo.kjennetegn + "</td><td>" + registerInfo.bilmerke + "</td" +
+                    "><td>" + registerInfo.biltype + "</td></tr>"
+            }
+            ut += "</table>";
+            $("#register").html(ut);
+
+
+        }
+
+    function slettKundene() {
+        $.get( "/slettAlle", function() {
+            hentAlle();
+        });
+    }
+
+
+</script>
+</body>
+</html>
